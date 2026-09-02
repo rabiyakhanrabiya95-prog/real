@@ -1161,7 +1161,7 @@ let currentLang = localStorage.getItem('fsLanguage') || 'en';
 let currentFilter = 'all';
 
 // ---------- DOM Ready ----------
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
 applyLanguage(currentLang);
 initLanguageSelector();
 initMobileMenu();
@@ -1182,117 +1182,81 @@ localStorage.setItem('fsLanguage', lang);
 document.documentElement.lang = lang;
 document.documentElement.dir = (lang === 'ar' || lang === 'ur') ? 'rtl' : 'ltr';
 
-document.querySelectorAll('[data-i18n]').forEach(function(el) {
-var key = el.getAttribute('data-i18n');
+document.querySelectorAll('[data-i18n]').forEach(el => {
+const key = el.getAttribute('data-i18n');
 if (translations[lang] && translations[lang][key]) {
 el.textContent = translations[lang][key];
 }
 });
 
-var currentLangSpan = document.querySelector('.current-lang');
+const currentLangSpan = document.querySelector('.current-lang');
 if (currentLangSpan) {
 currentLangSpan.textContent = translations[lang]['lang.current'];
 }
 
-document.querySelectorAll('.lang-option').forEach(function(btn) {
+document.querySelectorAll('.lang-option').forEach(btn => {
 btn.classList.toggle('active', btn.dataset.lang === lang);
 });
 
 renderProperties();
 updateActiveNav();
 updateOpeningStatus();
+
 }
 
 function initLanguageSelector() {
-var langBtn = document.querySelector('.lang-btn');
-var dropdown = document.getElementById('langDropdown');
-if (!langBtn || !dropdown) {
-console.warn('Language selector elements not found');
-return;
-}
+const langBtn = document.querySelector('.lang-btn');
+const dropdown = document.getElementById('langDropdown');
+if (!langBtn || !dropdown) return;
 
-// Toggle dropdown on button click
-langBtn.addEventListener('click', function(e) {
+langBtn.addEventListener('click', (e) => {
 e.stopPropagation();
-e.preventDefault();
-var isOpen = dropdown.classList.contains('open');
+const isOpen = dropdown.classList.contains('open');
 dropdown.classList.toggle('open', !isOpen);
 langBtn.setAttribute('aria-expanded', !isOpen);
 });
 
-// Handle language selection
-dropdown.addEventListener('click', function(e) {
-var option = e.target.closest('.lang-option');
+dropdown.addEventListener('click', (e) => {
+const option = e.target.closest('.lang-option');
 if (option) {
-var lang = option.dataset.lang;
-if (lang) {
-applyLanguage(lang);
+applyLanguage(option.dataset.lang);
 dropdown.classList.remove('open');
 langBtn.setAttribute('aria-expanded', 'false');
-}
 }
 });
 
-// Close dropdown when clicking outside
-document.addEventListener('click', function(e) {
-if (dropdown.classList.contains('open') && 
-!dropdown.contains(e.target) && 
-!langBtn.contains(e.target)) {
-dropdown.classList.remove('open');
-langBtn.setAttribute('aria-expanded', 'false');
-}
-});
 }
 
 // ---------- Mobile Menu ----------
 function initMobileMenu() {
-var toggle = document.querySelector('.mobile-menu-toggle');
-var mobileNav = document.getElementById('mobileNav');
-if (!toggle || !mobileNav) {
-console.warn('Mobile menu elements not found');
-return;
-}
+const toggle = document.querySelector('.mobile-menu-toggle');
+const mobileNav = document.getElementById('mobileNav');
+if (!toggle || !mobileNav) return;
 
-toggle.addEventListener('click', function(e) {
-e.preventDefault();
-var isOpen = mobileNav.classList.contains('open');
+toggle.addEventListener('click', () => {
+const isOpen = mobileNav.classList.contains('open');
 mobileNav.classList.toggle('open', !isOpen);
 toggle.setAttribute('aria-expanded', !isOpen);
 toggle.classList.toggle('active', !isOpen);
 });
 
-// Close mobile menu when clicking a link
-var links = mobileNav.querySelectorAll('a');
-links.forEach(function(link) {
-link.addEventListener('click', function() {
+mobileNav.querySelectorAll('a').forEach(link => {
+link.addEventListener('click', () => {
 mobileNav.classList.remove('open');
 toggle.setAttribute('aria-expanded', 'false');
 toggle.classList.remove('active');
 });
 });
 
-// Close mobile menu when clicking outside
-document.addEventListener('click', function(e) {
-if (mobileNav.classList.contains('open') && 
-!mobileNav.contains(e.target) && 
-!toggle.contains(e.target)) {
-mobileNav.classList.remove('open');
-toggle.setAttribute('aria-expanded', 'false');
-toggle.classList.remove('active');
-}
-});
 }
 
 // ---------- Active Nav ----------
 function updateActiveNav() {
-var currentPage = window.location.pathname.split('/').pop() || 'index.html';
-var navLinks = document.querySelectorAll('.desktop-nav a, .mobile-nav a');
-navLinks.forEach(function(link) {
-var href = link.getAttribute('href');
-if (href) {
-var hrefPage = href.split('/').pop();
+const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+document.querySelectorAll('.desktop-nav a, .mobile-nav a').forEach(link => {
+const href = link.getAttribute('href');
+const hrefPage = href.split('/').pop();
 link.classList.toggle('active', hrefPage === currentPage);
-}
 });
 }
 
@@ -1306,46 +1270,41 @@ return prop.translations[lang] || prop.translations.en;
 }
 
 function createPropertyCard(prop) {
-var t = getPropertyTranslation(prop, currentLang);
-var card = document.createElement('article');
+const t = getPropertyTranslation(prop, currentLang);
+const card = document.createElement('article');
 card.className = 'property-card';
 card.dataset.id = prop.id;
-card.innerHTML = '<div class="property-card-image"><img src="' + prop.image + '" alt="' + t.title + '" loading="lazy" decoding="async"><span class="property-status ' + prop.status + '">' + (prop.status === 'available' ? translations[currentLang]['filters.available'] : translations[currentLang]['soldText']) + '</span></div><div class="property-card-body"><span class="property-category">' + (translations[currentLang]['filters.' + prop.category] || prop.category) + '</span><h3 class="property-title">' + t.title + '</h3><p class="property-location">📍 ' + t.location + '</p><div class="property-details"><span class="property-detail-item">🛏 ' + prop.bedrooms + '</span><span class="property-detail-item">🛁 ' + prop.bathrooms + '</span><span class="property-detail-item">📐 ' + prop.area + '</span></div><p class="property-description">' + t.description + '</p><button class="btn btn-outline view-details" data-id="' + prop.id + '">' + translations[currentLang]['featured.viewDetails'] + '</button></div>';
-card.querySelector('.view-details').addEventListener('click', function(e) {
+card.innerHTML =   <div class="property-card-image">   <img src="${prop.image}" alt="${t.title}" loading="lazy" decoding="async">   <span class="property-status ${prop.status}">${prop.status === 'available' ? translations[currentLang]['filters.available'] : translations[currentLang]['soldText']}</span>   </div>   <div class="property-card-body">   <span class="property-category">${translations[currentLang]['filters.' + prop.category] || prop.category}</span>   <h3 class="property-title">${t.title}</h3>   <p class="property-location">📍 ${t.location}</p>   <div class="property-details">   <span class="property-detail-item">🛏 ${prop.bedrooms}</span>   <span class="property-detail-item">🛁 ${prop.bathrooms}</span>   <span class="property-detail-item">📐 ${prop.area}</span>   </div>   <p class="property-description">${t.description}</p>   <button class="btn btn-outline view-details" data-id="${prop.id}">${translations[currentLang]['featured.viewDetails']}</button>   </div>  ;
+card.querySelector('.view-details').addEventListener('click', (e) => {
 e.stopPropagation();
 openPropertyModal(prop);
 });
-card.addEventListener('click', function() {
-openPropertyModal(prop);
-});
+card.addEventListener('click', () => openPropertyModal(prop));
 return card;
 }
 
 function renderFeaturedProperties() {
-var grid = document.getElementById('featuredPropertiesGrid');
+const grid = document.getElementById('featuredPropertiesGrid');
 if (!grid) return;
 grid.innerHTML = '';
-var availableProperties = propertiesData.filter(function(p) { return p.status === 'available'; });
-var featured = availableProperties.slice(0, 3);
-featured.forEach(function(prop) {
+propertiesData.filter(p => p.status === 'available').slice(0, 3).forEach(prop => {
 grid.appendChild(createPropertyCard(prop));
 });
 }
 
-function renderAllProperties(filter) {
-if (typeof filter === 'undefined') filter = 'all';
-var grid = document.getElementById('allPropertiesGrid') || document.getElementById('villasGrid');
+function renderAllProperties(filter = 'all') {
+const grid = document.getElementById('allPropertiesGrid') || document.getElementById('villasGrid');
 if (!grid) return;
 grid.innerHTML = '';
 
-var baseData = propertiesData;
+let baseData = propertiesData;
 if (window.PAGE_FILTER === 'villa') {
-baseData = propertiesData.filter(function(p) { return p.type === 'villa'; });
+baseData = propertiesData.filter(p => p.type === 'villa');
 }
 
-var filtered = baseData;
+let filtered = baseData;
 if (filter !== 'all') {
-filtered = baseData.filter(function(p) {
+filtered = baseData.filter(p => {
 if (filter === 'available') return p.status === 'available';
 if (filter === 'villa') return p.type === 'villa';
 if (filter === 'family') return p.type === 'family';
@@ -1354,9 +1313,10 @@ if (filter === 'commercial') return p.category === 'commercial';
 return p.category === filter;
 });
 }
-filtered.forEach(function(prop) {
+filtered.forEach(prop => {
 grid.appendChild(createPropertyCard(prop));
 });
+
 }
 
 function renderProperties() {
@@ -1365,14 +1325,13 @@ renderAllProperties(currentFilter || 'all');
 }
 
 function initPropertyFilters() {
-var filterBar = document.querySelector('.filter-bar');
+const filterBar = document.querySelector('.filter-bar');
 if (!filterBar) return;
-filterBar.addEventListener('click', function(e) {
-var btn = e.target.closest('.filter-btn');
+filterBar.addEventListener('click', (e) => {
+const btn = e.target.closest('.filter-btn');
 if (!btn) return;
 currentFilter = btn.dataset.filter;
-var buttons = filterBar.querySelectorAll('.filter-btn');
-buttons.forEach(function(b) { b.classList.remove('active'); });
+filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
 btn.classList.add('active');
 renderAllProperties(currentFilter);
 });
@@ -1385,28 +1344,28 @@ renderAllProperties('all');
 
 // ---------- Property Modal ----------
 function openPropertyModal(prop) {
-var t = getPropertyTranslation(prop, currentLang);
-var modal = document.createElement('div');
+const t = getPropertyTranslation(prop, currentLang);
+const modal = document.createElement('div');
 modal.className = 'property-modal';
-modal.innerHTML = '<div class="modal-backdrop"></div><div class="modal-content"><button class="modal-close" aria-label="Close">×</button><img src="' + prop.image + '" alt="' + t.title + '"><h2>' + t.title + '</h2><p>📍 ' + t.location + '</p><p>🛏 ' + prop.bedrooms + ' | 🛁 ' + prop.bathrooms + ' | 📐 ' + prop.area + '</p><p>' + t.description + '</p><p><strong>' + (translations[currentLang]['filters.' + prop.category] || prop.category) + '</strong> · ' + prop.status + '</p><a href="../company/talk-to-an-advisor.html" class="btn btn-primary">' + translations[currentLang]['nav.advisor'] + '</a></div>';
+modal.innerHTML =   <div class="modal-backdrop"></div>   <div class="modal-content">   <button class="modal-close" aria-label="Close">×</button>   <img src="${prop.image}" alt="${t.title}">   <h2>${t.title}</h2>   <p>📍 ${t.location}</p>   <p>🛏 ${prop.bedrooms} | 🛁 ${prop.bathrooms} | 📐 ${prop.area}</p>   <p>${t.description}</p>   <p><strong>${translations[currentLang]['filters.' + prop.category] || prop.category}</strong> · ${prop.status}</p>   <a href="../company/talk-to-an-advisor.html" class="btn btn-primary">${translations[currentLang]['nav.advisor']}</a>   </div>  ;
 document.body.appendChild(modal);
-modal.querySelector('.modal-close').addEventListener('click', function() { modal.remove(); });
-modal.querySelector('.modal-backdrop').addEventListener('click', function() { modal.remove(); });
+modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
+modal.querySelector('.modal-backdrop').addEventListener('click', () => modal.remove());
 modal.querySelector('.modal-close').focus();
 }
 
 // ---------- Form Validation ----------
 function initForms() {
-var advisorForm = document.getElementById('advisorForm');
+const advisorForm = document.getElementById('advisorForm');
 if (advisorForm) {
-advisorForm.addEventListener('submit', function(e) {
+advisorForm.addEventListener('submit', (e) => {
 e.preventDefault();
 if (validateAdvisorForm()) {
-var success = document.getElementById('advisorFormSuccess');
+const success = document.getElementById('advisorFormSuccess');
 if (success) {
 success.hidden = false;
 advisorForm.reset();
-setTimeout(function() { success.hidden = true; }, 5000);
+setTimeout(() => { success.hidden = true; }, 5000);
 }
 }
 });
@@ -1414,12 +1373,12 @@ setTimeout(function() { success.hidden = true; }, 5000);
 }
 
 function validateAdvisorForm() {
-var name = document.getElementById('fullName');
-var email = document.getElementById('email');
-var phone = document.getElementById('phone');
-var propertyType = document.getElementById('propertyType');
-var message = document.getElementById('message');
-var isValid = true;
+const name = document.getElementById('fullName');
+const email = document.getElementById('email');
+const phone = document.getElementById('phone');
+const propertyType = document.getElementById('propertyType');
+const message = document.getElementById('message');
+let isValid = true;
 
 clearErrors();
 
@@ -1427,7 +1386,7 @@ if (!name.value.trim()) {
 showError('fullNameError', translations[currentLang]['form.fullNameError']);
 isValid = false;
 }
-if (!email.value.trim() || !/\S+@\S+\.\S+/.test(email.value)) {
+if (!email.value.trim() || !/\S+@\S+.\S+/.test(email.value)) {
 showError('emailError', translations[currentLang]['form.emailError']);
 isValid = false;
 }
@@ -1444,40 +1403,40 @@ showError('messageError', translations[currentLang]['form.messageError']);
 isValid = false;
 }
 return isValid;
+
 }
 
 function showError(id, msg) {
-var el = document.getElementById(id);
+const el = document.getElementById(id);
 if (el) el.textContent = msg;
 }
 
 function clearErrors() {
-var errorElements = document.querySelectorAll('.error-message');
-errorElements.forEach(function(el) { el.textContent = ''; });
+document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
 }
 
 // ---------- Opening Status (India Timezone) ----------
 function updateOpeningStatus() {
-var statusEl = document.getElementById('openStatus');
+const statusEl = document.getElementById('openStatus');
 if (!statusEl) return;
-var now = new Date();
-var indiaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-var day = indiaTime.getDay();
-var hours = indiaTime.getHours();
-var minutes = indiaTime.getMinutes();
-var timeInMinutes = hours * 60 + minutes;
+const now = new Date();
+const indiaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+const day = indiaTime.getDay();
+const hours = indiaTime.getHours();
+const minutes = indiaTime.getMinutes();
+const timeInMinutes = hours * 60 + minutes;
 
-var status = 'closed';
-var label = translations[currentLang]['openClosed'];
+let status = 'closed';
+let label = translations[currentLang]['openClosed'];
 
 if (day === 5) {
 status = 'closed';
 label = translations[currentLang]['openClosed'];
 } else {
-var morningStart = 9 * 60;
-var morningEnd = 11 * 60 + 30;
-var eveningStart, eveningEnd = 21 * 60 + 30;
-if ([6,0,1].indexOf(day) !== -1) {
+let morningStart = 9 * 60;
+let morningEnd = 11 * 60 + 30;
+let eveningStart, eveningEnd = 21 * 60 + 30;
+if ([6,0,1].includes(day)) {
 eveningStart = 15 * 60 + 30;
 } else {
 eveningStart = 13 * 60 + 30;
@@ -1497,6 +1456,7 @@ label = translations[currentLang]['openClosed'];
 
 statusEl.className = 'open-status ' + status;
 statusEl.textContent = label;
+
 }
 
 function initOpeningStatus() {
@@ -1506,16 +1466,16 @@ setInterval(updateOpeningStatus, 60000);
 
 // ---------- Scroll Animations ----------
 function initScrollAnimations() {
-var elements = document.querySelectorAll('.service-card, .property-card, .about-image, .about-content');
-var observer = new IntersectionObserver(function(entries) {
-entries.forEach(function(entry) {
+const elements = document.querySelectorAll('.service-card, .property-card, .about-image, .about-content');
+const observer = new IntersectionObserver((entries) => {
+entries.forEach(entry => {
 if (entry.isIntersecting) {
 entry.target.classList.add('fade-in');
 observer.unobserve(entry.target);
 }
 });
 }, { threshold: 0.1 });
-elements.forEach(function(el) {
+elements.forEach(el => {
 el.classList.add('animate-ready');
 observer.observe(el);
 });
@@ -1523,27 +1483,23 @@ observer.observe(el);
 
 // ---------- Close dropdowns on outside click ----------
 function closeDropdownsOnOutsideClick() {
-document.addEventListener('click', function(e) {
-var dropdown = document.getElementById('langDropdown');
-var langBtn = document.querySelector('.lang-btn');
+document.addEventListener('click', (e) => {
+const dropdown = document.getElementById('langDropdown');
+const langBtn = document.querySelector('.lang-btn');
 if (dropdown && dropdown.classList.contains('open') &&
 !dropdown.contains(e.target) && !langBtn.contains(e.target)) {
 dropdown.classList.remove('open');
 langBtn.setAttribute('aria-expanded', 'false');
 }
 });
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', (e) => {
 if (e.key === 'Escape') {
-var dropdown = document.getElementById('langDropdown');
+const dropdown = document.getElementById('langDropdown');
 if (dropdown && dropdown.classList.contains('open')) {
 dropdown.classList.remove('open');
-var langBtn = document.querySelector('.lang-btn');
-if (langBtn) {
-langBtn.setAttribute('aria-expanded', 'false');
-}
-}
-}
-});
-}
+document.querySelector('.lang-btn').setAttribute('aria-expanded', 'false');
 
-console.log('FS Real Estate JavaScript loaded successfully!');
+          }
+        }
+    });
+}
