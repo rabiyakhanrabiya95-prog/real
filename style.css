@@ -32,50 +32,34 @@ gap: 24px;
 flex: 0 0 auto;
 display: flex;
 align-items: center;
-justify-content: center;
-width: 220px;
-height: 60px;
+justify-content: flex-start;
+width: auto;
+height: auto;
 position: relative;
-overflow: hidden;
 text-decoration: none;
 }
 
-/* Logo image - proper 1:1 sizing */
+/* Logo image - perfect 1:1 sizing */
 .brand-logo {
 display: block;
 width: 60px;
 height: 60px;
 flex-shrink: 0;
 object-fit: contain;
+border-radius: 0;
 }
 
-/* Brand text next to logo */
+/* Completely hide text - only logo visible */
 .brand-text {
-display: flex;
-flex-direction: column;
-margin-left: 12px;
-line-height: 1.2;
+display: none !important;
 }
 
-.brand-text .brand-name {
-font-size: 1.1rem;
-font-weight: 700;
-color: var(--color-navy, #0B1F3A);
-letter-spacing: -0.01em;
-}
-
-.brand-text .brand-sub {
-font-size: 0.6rem;
-font-weight: 500;
-color: var(--color-muted, #6B7A8F);
-text-transform: uppercase;
-letter-spacing: 0.06em;
-}
-
-/* Hide old brand elements */
+/* Hide any other brand elements */
 .brand-arabic,
-.brand-english {
-display: none;
+.brand-english,
+.brand-name,
+.brand-sub {
+display: none !important;
 }
 
 /* ===== Navigation ===== */
@@ -83,6 +67,7 @@ display: none;
 display: flex;
 align-items: center;
 gap: 8px;
+margin-left: 20px;
 }
 
 .nav-link {
@@ -378,18 +363,9 @@ padding: 0 20px;
 gap: 16px;
 }
 
-.brand {
-width: 180px;
-height: 52px;
-}
-
 .brand-logo {
 width: 52px;
 height: 52px;
-}
-
-.brand-text .brand-name {
-font-size: 0.95rem;
 }
 
 .desktop-nav {
@@ -428,22 +404,9 @@ padding: 0 14px;
 gap: 12px;
 }
 
-.brand {
-width: 150px;
-height: 44px;
-}
-
 .brand-logo {
 width: 44px;
 height: 44px;
-}
-
-.brand-text .brand-name {
-font-size: 0.82rem;
-}
-
-.brand-text .brand-sub {
-font-size: 0.5rem;
 }
 
 .header-actions {
@@ -498,26 +461,9 @@ padding: 0 10px;
 gap: 8px;
 }
 
-.brand {
-width: 130px;
-height: 38px;
-}
-
 .brand-logo {
 width: 38px;
 height: 38px;
-}
-
-.brand-text .brand-name {
-font-size: 0.7rem;
-}
-
-.brand-text .brand-sub {
-font-size: 0.45rem;
-}
-
-.brand-text {
-margin-left: 8px;
 }
 
 .lang-btn,
@@ -539,4 +485,4 @@ margin: -1px;
 overflow: hidden;
 clip: rect(0, 0, 0, 0);
 border: 0;
-   }
+}
